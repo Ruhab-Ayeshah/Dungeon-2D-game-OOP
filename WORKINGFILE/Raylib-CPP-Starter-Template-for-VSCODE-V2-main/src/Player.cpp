@@ -156,7 +156,7 @@ void Player::Draw(){
         DrawTexturePro(Sprite_sheet,PlayerFrame,{32*Position.x, 32*Position.y, 32, 32 },{ 0.0f, 0.0f }, 0.0f, WHITE);
     }else{
         PlayerFrame.width = -(PlayerFrame.width);
-        DrawTexturePro(Sprite_sheet,PlayerFrame,{32*Position.x, Position.y, 32, 32},{0.0f,0.0f},0.0f, WHITE);
+        DrawTexturePro(Sprite_sheet,PlayerFrame,{32*Position.x, 32*Position.y, 32, 32},{0.0f,0.0f},0.0f, WHITE);
     }
 }
 
