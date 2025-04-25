@@ -19,8 +19,6 @@ struct Animation{
 
 class Player{
 
-    
-
     int Health;
     int Power;
 
@@ -34,18 +32,25 @@ class Player{
     bool isFlipped;
     int currentRow;
 
-    
+    // ======================== SMOOTH MOVEMENT ADDITIONS START ========================
+    Vector2 GridPosition;
+    Vector2 TargetPosition;
+    float moveSpeed;
+    bool isMoving;
+    // ======================== SMOOTH MOVEMENT ADDITIONS END ========================
+
     public:
-    Vector2 Position;
+        Vector2 Position;
         Texture2D Sprite_sheet;
 
         Player(Vector2& s);
         ~Player();
 
+        void Update(float dt);
         void Update_Animation(Animation* Anim);
         Rectangle GetAnimationFrame(int Frame, int FrameRow, int FrameWidth, int FrameHeight);
         void SetAnimation(Animation& anim, int r);
-        
+
         Animation& getAnim(string A);
         Animation* getCurrentAnim();
         bool getFlip();
@@ -58,8 +63,6 @@ class Player{
         void HandleInput(Map* l);
 
         void Move(char n, Map* l);
-
-
 };
 
 #endif

@@ -24,12 +24,12 @@ class Map{
     int tilesPerRow;
     Vector2 Spawn;   
 
-    Tile CompleteMap[30][40];
+    Tile CompleteMap[20][30];
     Texture2D tileset;
-    Texture2D minerals[10];
-    Texture2D shadow = LoadTexture("assets/Map_Assets/shadow.png");
+    // Texture2D minerals[10];
+    // Texture2D shadow = LoadTexture("assets/Map_Assets/shadow.png");
 
-    bool ItemOverlay[30][40];
+    // bool ItemOverlay[30][40];
     
     Rectangle getTileRec(int TileID);
     public:
