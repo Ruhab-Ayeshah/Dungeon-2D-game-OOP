@@ -6,8 +6,7 @@
 #include "raylib.h"
 using namespace std;
 
-struct Tile
-{
+struct Tile{
     bool walkable;
     bool exit;
     bool enemy;
@@ -17,36 +16,39 @@ struct Tile
     int ItemID = -1;
 };
 
-class Map
-{
+class Map{
 
-    int tileSize;
-    int tilesetWidth;
-    int tilesetHeight;
+    int tileSize;         
+    int tilesetWidth;     
+    int tilesetHeight;    
     int tilesPerRow;
-    Vector2 Spawn;
+    Vector2 Spawn;   
+    Vector2 Exit;
+
+    int wallID, floorID, exitID;
 
     Tile CompleteMap[20][30];
     Texture2D tileset;
-    // Texture2D minerals[10];
-    // Texture2D shadow = LoadTexture("assets/Map_Assets/shadow.png");
+    Texture2D exitTexture;
 
-    // bool ItemOverlay[30][40];
 
     Rectangle getTileRec(int TileID);
+    public:
 
-public:
-    Map(const string &filename);
-    ~Map();
-    void Draw();
-    void DrawItems();
-    void loadFile(const string &filename);
-    void setTile(int x, int y, bool isW, bool isE, bool isX, bool isC, bool isS, int ID);
-    bool isWalkable(int x, int y);
+        Map();
+        Map(const string& filename,int w, int f,int e, char const* tileFile);
+        ~Map();
+        void Draw();
+        void DrawItems();
+        void loadFile(const string& filename);
+        void setTile(int x, int y, bool isW, bool isE, bool isX, bool isC, bool isS, int ID);
+        bool isWalkable(int x, int y);
 
-    Vector2 &getSpawn();
+        Vector2& getSpawn();
+        Vector2& getExit();
 
-    Tile &getTile(int x, int y);
+        Tile& getTile(int x, int y);
+
 };
 
 #endif

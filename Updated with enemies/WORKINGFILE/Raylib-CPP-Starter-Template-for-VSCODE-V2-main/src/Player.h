@@ -59,6 +59,12 @@ public:
         void HandleInput(Map *l);
 
         void Move(char n, Map *l);
+
+        void setPos(Vector2& s);
+
+        void ResetToSpawn(Vector2 spawn);
+
+        Vector2& getGridPos();
 };
 
 #endif
