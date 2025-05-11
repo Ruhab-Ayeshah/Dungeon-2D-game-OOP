@@ -1,5 +1,6 @@
 #include "Map.h"
 #include "Player.h"
+#include "button.h"
 #include "Golem.h"
 #include <raylib.h>
 #include <raymath.h>
@@ -11,24 +12,37 @@ float floatingTextTimer = 0.0f;
 string floatingText = "";
 Vector2 floatingTextPos = {0, 0};
 
+bool gameStarted = false;
+bool gameOver = false;
+
 int main()
 {
 
 ///////////////////////////////// INITIAL SET UP STARTS ///////////////////////////////////////////////////////
 
-    const int virtualWidth = 960;
-    const int virtualHeight = 640;
+    const int virtualWidth = GetScreenWidth();
+    const int virtualHeight = GetScreenHeight();
     const int tileSize = 32;
     const int mapCols = 30;
     const int mapRows = 20;
 
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_FULLSCREEN_MODE);
+    SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(virtualWidth, virtualHeight, "2D Dungeon Explorer");
-
+    
     ToggleFullscreen();
     SetTargetFPS(60);
 
+    Texture2D background = LoadTexture("assets/menu.png");  
+    Texture2D exitbackground = LoadTexture("assets/exit.png");
+    
+
     Map Levels[2];
+
+    Vector2 screenCenter = {(GetScreenWidth() - 1024 * 0.5f) / 2,(GetScreenHeight() - 1024 * 0.5f) / 2};
+
+    Button button("assets/button.png", screenCenter);
+    Texture2D congrats = LoadTexture("assets/escapeText.png");
+    Texture2D exitText = LoadTexture("assets/exitText.png");
 
     Map Level1("assets/Map_Assets/Level1.txt",4,9,34,"assets/Map_Assets/Dungeon_Bricks_Shadow.png");
     Map Level2("assets/Map_Assets/Level2.txt",46,24,34,"assets/Map_Assets/Full.png");
@@ -71,7 +85,37 @@ int main()
 
         BeginDrawing();
         ClearBackground(BLACK);
+        if(!gameStarted){
 
+            DrawTexturePro(background,{0,0,(float)(int)background.width,(float)(int)background.height},{0,0,(float)(int)GetScreenWidth(),(float)(int)GetScreenHeight()},{0.0f,0.0f},0.0f,WHITE);
+           
+            button.Draw();
+           
+            if(button.isClicked()){
+                gameStarted = true;
+            }
+
+
+        }else if(gameOver){
+
+            
+            DrawTexturePro(exitbackground,{0,0,(float)(int)exitbackground.width,(float)(int)exitbackground.height},{0,0,(float)(int)GetScreenWidth(),(float)(int)GetScreenHeight()},{0.0f,0.0f},0.0f,WHITE);
+            
+            float scale = 0.5f;
+            float scaledW = congrats.width * scale;
+            float scaledH = congrats.height * scale;
+            Vector2 center = { (GetScreenWidth() - scaledW) / 2.0f, (GetScreenHeight() - scaledH) / 2.0f };
+
+            DrawTexturePro(congrats,{0, 0, (float)congrats.width, (float)congrats.height},{center.x, center.y, scaledW, scaledH}, {0.0f, 0.0f}, 0.0f, WHITE);
+
+           DrawTexturePro(exitText,{0, 0, (float)exitText.width, (float)exitText.height},{center.x, (GetScreenHeight()+center.y)/2, (float)(int)exitText.width*scale, (float)(int)exitText.height*scale}, {0.0f, 0.0f}, 0.0f, WHITE);
+        
+            if(IsKeyPressed(KEY_ESCAPE)){
+                break;
+            }
+
+
+        }else{
         BeginMode2D(camera);
 
 /////////////////////////////////// DRAWING ///////////////////////////////////
@@ -173,12 +217,21 @@ int main()
 
         DrawText("Move: WASD | Attack: SPACE | Exit: ESC", 10, 10, 20, RED);
 
-        EndMode2D();
+        if(currLevel==1 &&Vector2Equals(PlayerTest.getGridPos(), Levels[currLevel].getExit())){
+            gameOver = true;
+        }
 
+        EndMode2D();
+    }
         
 
         EndDrawing();
     }
+
+    UnloadTexture(background);
+    UnloadTexture(exitbackground);
+    UnloadTexture(congrats);
+    UnloadTexture(exitText);
 
     CloseWindow();
     return 0;

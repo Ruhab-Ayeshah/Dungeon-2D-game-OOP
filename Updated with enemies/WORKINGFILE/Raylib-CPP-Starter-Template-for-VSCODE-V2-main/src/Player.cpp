@@ -166,8 +166,8 @@ void Player::Move(char n, Map *l)
         if (globalGolem)
         {
             Vector2 golemTile = {
-                (int)(globalGolem->Position.x / 32),
-                (int)(globalGolem->Position.y / 32)};
+                (float)(int)(globalGolem->Position.x / 32),
+                (float)(int)(globalGolem->Position.y / 32)};
 
             if (next.x == golemTile.x && next.y == golemTile.y)
             {
