@@ -20,13 +20,22 @@ int main()
     ToggleFullscreen();
     SetTargetFPS(60);
 
-    Map Level1("assets/Map_Assets/Level1.txt");
-    Player PlayerTest(Level1.getSpawn());
+    Map Levels[2];
+
+    Map Level1("assets/Map_Assets/Level1.txt",4,9,34,"assets/Map_Assets/Dungeon_Bricks_Shadow.png");
+    Map Level2("assets/Map_Assets/Level2.txt",46,24,34,"assets/Map_Assets/Full.png");
+    
+    Levels[0] = Level1;
+    Levels[1] = Level2;
+    
+    int currLevel = 0;
+
+    Player PlayerTest(Levels[currLevel].getSpawn());
     Golem golem({200, 200});
     globalGolem = &golem;
 
     golem.SetTarget(&PlayerTest.Position);
-    golem.SetMap(&Level1);
+    golem.SetMap(&Levels[currLevel]);
 
     Camera2D camera = {0};
     camera.zoom = 3.0f;
@@ -35,7 +44,32 @@ int main()
     {
         float dt = GetFrameTime();
 
-        PlayerTest.HandleInput(&Level1);
+        
+
+        Vector2 playerCenter = {
+            PlayerTest.Position.x + tileSize / 2,
+            PlayerTest.Position.y + tileSize / 2};
+
+        float halfWidth = (float)GetScreenWidth() / (2.0f * camera.zoom);
+        float halfHeight = (float)GetScreenHeight() / (2.0f * camera.zoom);
+
+        camera.target.x = Clamp(playerCenter.x, halfWidth, mapCols * tileSize - halfWidth);
+        camera.target.y = Clamp(playerCenter.y, halfHeight, mapRows * tileSize - halfHeight);
+        camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        BeginMode2D(camera);
+
+
+        
+        Levels[currLevel].Draw();
+        PlayerTest.Draw();
+        golem.Draw();
+
+
+        PlayerTest.HandleInput(&Levels[currLevel]);
         PlayerTest.Update(dt);
         golem.Update(dt);
 
@@ -59,26 +93,6 @@ int main()
             }
         }
 
-        Vector2 playerCenter = {
-            PlayerTest.Position.x + tileSize / 2,
-            PlayerTest.Position.y + tileSize / 2};
-
-        float halfWidth = (float)GetScreenWidth() / (2.0f * camera.zoom);
-        float halfHeight = (float)GetScreenHeight() / (2.0f * camera.zoom);
-
-        camera.target.x = Clamp(playerCenter.x, halfWidth, mapCols * tileSize - halfWidth);
-        camera.target.y = Clamp(playerCenter.y, halfHeight, mapRows * tileSize - halfHeight);
-        camera.offset = {GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
-
-        BeginDrawing();
-        ClearBackground(BLACK);
-
-        BeginMode2D(camera);
-        Level1.Draw();
-        PlayerTest.Draw();
-        golem.Draw();
-        EndMode2D();
-
         if (PlayerTest.IsDead())
         {
             DrawText("You Died!", 400, 300, 40, RED);
@@ -88,7 +102,19 @@ int main()
             DrawText("Golem Died!", 400, 340, 40, GREEN);
         }
 
-        DrawText("Move: WASD | Attack: SPACE | Exit: ESC", 10, 10, 20, DARKGRAY);
+        if(currLevel<1 &&Vector2Equals(PlayerTest.getGridPos(), Levels[currLevel].getExit())){
+            currLevel++;
+            PlayerTest.ResetToSpawn(Levels[currLevel].getSpawn());
+            golem.SetTarget(&PlayerTest.Position);
+            golem.SetMap(&Levels[currLevel]);
+        }
+
+
+        DrawText("Move: WASD | Attack: SPACE | Exit: ESC", 10, 10, 20, RED);
+
+        EndMode2D();
+
+        
 
         EndDrawing();
     }

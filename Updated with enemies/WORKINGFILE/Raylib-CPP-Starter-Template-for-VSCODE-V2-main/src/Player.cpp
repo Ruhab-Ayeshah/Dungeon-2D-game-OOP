@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include "Player.h"
-#include "Golem.h"
+#include "golem.h"
 using namespace std;
 extern Golem *globalGolem;
 
@@ -12,9 +12,9 @@ Player::Player(Vector2 &s)
     Health = 100;
     Power = 20;
 
-    Idle = {0, 5, 0, 0.24, 0.24};
-    Attack = {0, 7, 0, 0.15, 0.15};
-    Death = {0, 7, 0, 0.16, 0.16};
+    Idle = {0, 5, 0, 0.15, 0.15};
+    Attack = {0, 7, 0, 0.07, 0.07};
+    Death = {0, 7, 0, 0.07, 0.07};
     MoveHorizontal = {0, 7, 0, 0.07, 0.07};
     MoveVertical = {0, 3, 0, 0.07, 0.07};
 
@@ -286,4 +286,19 @@ void Player::setFlip(bool x)
     isFlipped = x;
 }
 
+void Player::setPos(Vector2& s){
+    Position = {s.x * 32, s.y * 32};
+}
+
 // Declare the global pointer to Golem
+
+void Player::ResetToSpawn(Vector2 spawn){
+    GridPosition = spawn;
+    Position = {spawn.x * 32, spawn.y * 32};
+    TargetPosition = Position;
+    isMoving = false;
+}
+
+Vector2& Player::getGridPos(){
+    return GridPosition;
+}
