@@ -28,17 +28,21 @@ Player::Player(Vector2 &s)
     TargetPosition = Position;
     moveSpeed = 100.0f;
     isMoving = false;
+
+    Health = 100;
+    Score = 0;
+    Power = 10;
 }
 void Player::TakeDamage(int amount)
 {
-    health -= amount;
-    if (health < 0)
-        health = 0;
+    Health -= amount;
+    if (Health < 0)
+        Health = 0;
 }
 
 bool Player::IsDead()
 {
-    return health <= 0;
+    return Health <= 0;
 }
 
 Player::~Player()
@@ -302,3 +306,26 @@ void Player::ResetToSpawn(Vector2 spawn){
 Vector2& Player::getGridPos(){
     return GridPosition;
 }
+
+void Player::setHealth(int h){
+    
+    if(Health+h==100){
+        Health = 100;
+    }else{
+    Health +=h;
+    }
+}
+
+void Player::setScore(int s){
+    
+    Score+=s;
+}
+
+void Player::setPower(int p){
+    
+    Power = p;
+}
+
+int Player::getHealth(){return Health;}
+int Player::getScore(){return Score;}
+int Player::getPower(){return Power;}

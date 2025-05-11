@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "raylib.h"
+#include "Collectable.h"
 using namespace std;
 
 struct Tile{
@@ -27,6 +28,8 @@ class Map{
 
     int wallID, floorID, exitID;
 
+    
+    Collectable* collectables[20][30];
     Tile CompleteMap[20][30];
     Texture2D tileset;
     Texture2D exitTexture;
@@ -47,7 +50,12 @@ class Map{
         Vector2& getSpawn();
         Vector2& getExit();
 
+
         Tile& getTile(int x, int y);
+
+        Collectable* (*getcollectables())[30];
+        Tile (&getMap())[20][30];
+
 
 };
 
