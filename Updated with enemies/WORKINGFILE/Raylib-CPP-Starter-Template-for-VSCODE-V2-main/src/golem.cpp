@@ -6,7 +6,8 @@
 
 Golem::Golem(Vector2 position)
 {
-    Position = position;
+    Position.x= position.x*32;
+    Position.y= position.y*32;
     Health = 150;
 
     // Load separate sprite sheets for each animation
@@ -34,6 +35,7 @@ Golem::Golem(Vector2 position)
     attackDone = false;
     
 }
+
 
 Golem::~Golem()
 {
@@ -291,8 +293,8 @@ void Golem::Draw()
     
     // Define the destination rectangle on screen
     Rectangle destRect = {
-        Position.x,    
-        Position.y,     
+        (Position.x),    
+        (Position.y),     
         32.0f,         
         32.0f          
     };
@@ -319,7 +321,7 @@ void Golem::TakeDamage(int amount)
     }
     
     HitsTaken++;
-    
+    cout<<"Golem hit! Hits taken: " << HitsTaken << endl;
     // Handle damage
     if (HitsTaken >= 3) {
         // Golem dies after 3 hits
