@@ -301,6 +301,9 @@ void Player::ResetToSpawn(Vector2 spawn){
     Position = {spawn.x * 32, spawn.y * 32};
     TargetPosition = Position;
     isMoving = false;
+
+
+
 }
 
 Vector2& Player::getGridPos(){
@@ -329,3 +332,8 @@ void Player::setPower(int p){
 int Player::getHealth(){return Health;}
 int Player::getScore(){return Score;}
 int Player::getPower(){return Power;}
+
+void Player::Reset(){
+    Score = 0;
+    Health = 100;
+}

@@ -73,6 +73,8 @@ public:
         int getHealth();
         int getScore();
         int getPower();
+
+        void Reset();
 };
 
 #endif
