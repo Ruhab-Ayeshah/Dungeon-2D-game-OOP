@@ -22,7 +22,8 @@ Map::Map(const string& filename,int w, int f, int e,char const* tileFile){
     tilesetHeight = tileset.height;
     tilesetWidth = tileset.width;
     tilesPerRow = tilesetWidth/tileSize;
-
+    currEnemyCount = 0;
+    maxEnemyCount = 3;
     wallID = w;
     floorID = f;
     exitID = e;
@@ -107,6 +108,7 @@ void Map::loadFile(const string& filename){
                     CompleteMap[y][x] = {true,true,false,false,false,exitID};
                     Exit = {(float)x,(float)y};
                     break;
+                    
 
                 case '$':
                     CompleteMap[y][x] = {true,false,false,true,false,floorID};
@@ -122,6 +124,11 @@ void Map::loadFile(const string& filename){
 
                 case 'X':
                     CompleteMap[y][x] = {true,false,true,false,false,floorID};
+                    if (currEnemyCount < maxEnemyCount) {
+                        EnemySpawn[currEnemyCount] = {(float)x,(float)y};
+                        currEnemyCount++;
+                        cout<<"Enemy Spawned at: "<<x<<","<<y<<endl;
+                    }
                 break;
 
                 default:
@@ -173,7 +180,11 @@ void Map::Draw()
     
 }
 
-
+Vector2& Map::getEnemySpawn(int index){
+    if(index<3){
+        return EnemySpawn[index];
+    }
+}
 
 
 Vector2& Map::getSpawn(){
