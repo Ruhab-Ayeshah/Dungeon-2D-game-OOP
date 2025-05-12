@@ -3,6 +3,7 @@
 #include "button.h"
 #include "Golem.h"
 #include "TextManager.h"
+#include "HighScoreManager.h"
 #include <raylib.h>
 #include <raymath.h>
 #include <string>
@@ -15,6 +16,11 @@ Vector2 floatingTextPos = {0, 0};
 
 bool gameStarted = false;
 bool gameOver = false;
+
+Map LoadLevel(const string& p, int w, int f, int e, const char* t){
+     
+    return Map(p, w, f, e, t);
+}
 
 int main()
 {
@@ -35,8 +41,10 @@ int main()
 
     Texture2D background = LoadTexture("assets/menu.png");  
     Texture2D exitbackground = LoadTexture("assets/exit.png");
+    Texture2D deathbackground = LoadTexture("assets/death.jpg");
     
     bool gDeath = false;
+    bool pDeath = false;
 
     Map Levels[2];
 
@@ -45,6 +53,7 @@ int main()
     Button button("assets/button.png", screenCenter);
     Texture2D congrats = LoadTexture("assets/escapeText.png");
     Texture2D exitText = LoadTexture("assets/exitText.png");
+    Texture2D deathText = LoadTexture("assets/deathText.png");
 
     Map Level1("assets/Map_Assets/Level1.txt",4,9,34,"assets/Map_Assets/Dungeon_Bricks_Shadow.png");
     Map Level2("assets/Map_Assets/Level2.txt",46,24,34,"assets/Map_Assets/Full.png");
@@ -65,6 +74,10 @@ int main()
 
     Camera2D camera = {0};
     camera.zoom = 3.0f;
+
+    HighScoreManager high("HighScore.txt");
+    bool newHighScore = false;
+
 ///////////////////////////////// INITIAL SET UP ENDS ///////////////////////////////////////////////////////
 
 
@@ -102,7 +115,12 @@ int main()
 
         }else if(gameOver){
 
-            
+            if(high.Check(PlayerTest.getScore())){
+            Text.Create("New High Score!", {10, 10}, YELLOW, 60,1000.0F);
+            newHighScore = true;
+            }
+
+
             DrawTexturePro(exitbackground,{0,0,(float)(int)exitbackground.width,(float)(int)exitbackground.height},{0,0,(float)(int)GetScreenWidth(),(float)(int)GetScreenHeight()},{0.0f,0.0f},0.0f,WHITE);
             
             float scale = 0.5f;
@@ -114,11 +132,50 @@ int main()
 
            DrawTexturePro(exitText,{0, 0, (float)exitText.width, (float)exitText.height},{center.x, (GetScreenHeight()+center.y)/2, (float)(int)exitText.width*scale, (float)(int)exitText.height*scale}, {0.0f, 0.0f}, 0.0f, WHITE);
         
+           Text.Draw();
             if(IsKeyPressed(KEY_ESCAPE)){
                 break;
             }
 
 
+        }else if(pDeath){
+
+            ClearBackground(BLACK);
+
+            DrawTexturePro(deathbackground,{0,0,(float)(int)deathbackground.width,(float)(int)deathbackground.height},{0,0,(float)(int)GetScreenWidth(),(float)(int)GetScreenHeight()},{0.0f,0.0f},0.0f,WHITE);
+            
+            float scale = 0.8f;
+            float scaledW = deathText.width * scale;
+            float scaledH = deathText.height * scale;
+            Vector2 center = {(GetScreenWidth() - scaledW)/2.0f,(GetScreenHeight() - scaledH)/2.0f};
+
+            DrawTexturePro(deathText,{0, 0, (float)deathText.width, (float)deathText.height},{center.x, center.y, scaledW, scaledH}, {0.0f, 0.0f}, 0.0f, WHITE);
+
+
+
+            if(IsKeyPressed(KEY_SPACE)){
+
+            
+
+            Levels[0].Reset("assets/Map_Assets/Level1.txt",4,9,34,"assets/Map_Assets/Dungeon_Bricks_Shadow.png");
+            Levels[1].Reset("assets/Map_Assets/Level2.txt",46,24,34,"assets/Map_Assets/Full.png");
+            
+            currLevel = 0;
+            PlayerTest.ResetToSpawn(Levels[0].getSpawn());
+            PlayerTest.Reset();
+            pDeath = false;
+
+            gDeath = false;
+            golem.SetMap(&Levels[0]);
+            golem.SetTarget(&PlayerTest.Position);
+            golem.Reset({250,250});
+            gameStarted = true;
+        
+            }
+
+            EndDrawing();
+            continue;
+        
         }else{
         BeginMode2D(camera);
 
@@ -159,15 +216,14 @@ int main()
         {
             if (CheckCollisionRecs(playerHitbox, golemHitbox))
             {
-                PlayerTest.TakeDamage(1);
+                PlayerTest.TakeDamage(100);
                 golem.attackDone = false;
             }
 
-            if (PlayerTest.IsDead() && floatingTextTimer <= 0.0f)
+            if (PlayerTest.IsDead())
             {
-                floatingText = "You Died!";
-                floatingTextPos = {PlayerTest.Position.x, PlayerTest.Position.y - 30};
-                floatingTextTimer = 2.0f;
+                
+                pDeath = true;
             }
 
         }
@@ -250,6 +306,8 @@ int main()
     UnloadTexture(exitbackground);
     UnloadTexture(congrats);
     UnloadTexture(exitText);
+    UnloadTexture(deathbackground);
+    UnloadTexture(deathText);
 
     CloseWindow();
     return 0;

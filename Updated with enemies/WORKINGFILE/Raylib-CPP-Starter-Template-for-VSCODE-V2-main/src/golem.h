@@ -42,6 +42,8 @@ public:
 
     void SetTarget(Vector2 *playerPos);
 
+    void Reset(Vector2 newPos);
+
 private:
     void AI_Behavior(float dt);
 };

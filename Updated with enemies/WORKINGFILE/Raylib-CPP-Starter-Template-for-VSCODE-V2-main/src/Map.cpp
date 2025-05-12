@@ -1,4 +1,5 @@
 #include "Map.h"
+#include <raylib.h>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -194,3 +195,37 @@ Collectable* (*Map::getcollectables())[30] {
 Tile (&Map::getMap())[20][30] {
     return CompleteMap;
 }
+
+
+
+
+
+void Map::Reset(const string& filename, int w, int f, int e, const char* tileFile) {
+    // Clean existing collectables
+    for (int y = 0; y < 20; y++) {
+        for (int x = 0; x < 30; x++) {
+            if (collectables[y][x]) {
+                delete collectables[y][x];
+                collectables[y][x] = nullptr;
+            }
+        }
+    }
+
+    // Reload tile texture
+    if (tileset.id > 0) UnloadTexture(tileset);
+    if (exitTexture.id > 0) UnloadTexture(exitTexture);
+
+    tileset = LoadTexture(tileFile);
+    exitTexture = LoadTexture("assets/Map_Assets/exit.png");
+    tileSize = 32;
+    tilesetHeight = tileset.height;
+    tilesetWidth = tileset.width;
+    tilesPerRow = tilesetWidth / tileSize;
+
+    wallID = w;
+    floorID = f;
+    exitID = e;
+
+    loadFile(filename);
+}
+

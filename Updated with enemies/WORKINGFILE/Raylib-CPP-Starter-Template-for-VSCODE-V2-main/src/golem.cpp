@@ -400,3 +400,9 @@ bool Golem::IsDead()
 {
     return (State == "die" && !isActionPlaying);
 }
+
+void Golem::Reset(Vector2 newPos){
+    Position = newPos;
+    Health = 5;
+    State = "idle";
+}

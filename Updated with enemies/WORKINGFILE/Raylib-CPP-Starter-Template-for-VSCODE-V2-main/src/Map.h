@@ -56,6 +56,7 @@ class Map{
         Collectable* (*getcollectables())[30];
         Tile (&getMap())[20][30];
 
+        void Reset(const string& filename, int w, int f, int e, const char* tileFile);
 
 };
 
