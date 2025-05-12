@@ -268,7 +268,9 @@ void Golem::Draw()
 {
     // Select the appropriate texture based on the current state
     Texture2D currentTexture;
-    
+    if (State == "die" && !isActionPlaying) {
+    return;
+}
     // Pick texture based on animation state
     if (CurrentAnim == &Attack)
         currentTexture = AttackSheet;
@@ -323,7 +325,7 @@ void Golem::TakeDamage(int amount)
         // Golem dies after 3 hits
         State = "die";
         SetAnimation(Die, 0);
-        isActionPlaying = true;
+        isActionPlaying = false;
     } else {
 
         SetAnimation(Attack, 0); // Use attack anim as hit reaction
