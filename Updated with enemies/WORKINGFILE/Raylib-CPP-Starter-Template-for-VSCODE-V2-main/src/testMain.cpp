@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "button.h"
 #include "Golem.h"
+#include "TextManager.h"
 #include <raylib.h>
 #include <raymath.h>
 #include <string>
@@ -35,6 +36,7 @@ int main()
     Texture2D background = LoadTexture("assets/menu.png");  
     Texture2D exitbackground = LoadTexture("assets/exit.png");
     
+    bool gDeath = false;
 
     Map Levels[2];
 
@@ -58,6 +60,8 @@ int main()
 
     golem.SetTarget(&PlayerTest.Position);
     golem.SetMap(&Levels[currLevel]);
+
+    TextManager Text;
 
     Camera2D camera = {0};
     camera.zoom = 3.0f;
@@ -140,7 +144,16 @@ int main()
             {
                 golem.TakeDamage(1);
             }
+
         }
+
+        if (golem.IsDead()&& !gDeath)
+            {
+                Text.Create("Golem DEAD",{PlayerTest.Position.x, PlayerTest.Position.y - 30},GREEN,10);
+                gDeath = true;
+                
+        }
+
 
         if (golem.attackDone && !PlayerTest.IsDead())
         {
@@ -149,16 +162,18 @@ int main()
                 PlayerTest.TakeDamage(1);
                 golem.attackDone = false;
             }
+
+            if (PlayerTest.IsDead() && floatingTextTimer <= 0.0f)
+            {
+                floatingText = "You Died!";
+                floatingTextPos = {PlayerTest.Position.x, PlayerTest.Position.y - 30};
+                floatingTextTimer = 2.0f;
+            }
+
         }
 
-        if (PlayerTest.IsDead())
-        {
-            DrawText("You Died!", 400, 300, 40, RED);
-        }
-        if (golem.IsDead())
-        {
-            DrawText("Golem Died!", 400, 340, 40, GREEN);
-        }
+        
+        
 /////////////////////////////////// GOLEM AND PLAYER INTERACTION /////////////////////////////////////////
 
 
@@ -196,11 +211,11 @@ int main()
 
                 /////////////////////////// HEALTH COLLECTABLE ////////////////////////////////
 
+                Vector2 textPos = {PlayerTest.Position.x, PlayerTest.Position.y - 10};
+
                 if(c->getType()=="Health"){
                     PlayerTest.setHealth(c->getValue());
-                    floatingText = "+10 Health";
-                    floatingTextPos = {PlayerTest.Position.x, PlayerTest.Position.y - 10};
-                    floatingTextTimer = 2.0f; // Show for 2 seconds
+                    Text.Create("+10 Health",textPos,GREEN);
 
                 }
                 
@@ -208,23 +223,15 @@ int main()
                 
                 else{
                     PlayerTest.setScore(c->getValue());
-                    floatingText = "+10 Score";
-                    floatingTextPos = {PlayerTest.Position.x, PlayerTest.Position.y - 10};
-                    floatingTextTimer = 2.0f; // Show for 2 seconds
-
-
+                    Text.Create("+10 Score",textPos,GREEN);   
 
                 }
             }
         }
 
         ////////////////////////// TEXT DISPLAYING AMOUNT OF SCORE/HEALTH GAINED ///////////////////////////
-
-        if (floatingTextTimer > 0.0f) {
-        floatingTextTimer -= GetFrameTime();
-        DrawText(floatingText.c_str(), (int)floatingTextPos.x, (int)floatingTextPos.y, 14, GREEN);
-        }
-
+        Text.Update();
+        Text.Draw();
 
         DrawText("Move: WASD | Attack: SPACE | Exit: ESC", 10, 10, 20, RED);
 
