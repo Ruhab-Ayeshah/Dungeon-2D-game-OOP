@@ -10,12 +10,18 @@
 
 Golem *globalGolem = nullptr; // define here
 
-float floatingTextTimer = 0.0f;
-string floatingText = "";
+
 Vector2 floatingTextPos = {0, 0};
+
+float cSCooldown = 0.0f;
+float hSCooldown = 0.0f;
+float pACooldown = 0.0f;
+float gOCooldown = 0.0f;
+
 
 bool gameStarted = false;
 bool gameOver = false;
+bool gOplayed = false;
 
 Map LoadLevel(const string& p, int w, int f, int e, const char* t){
      
@@ -35,6 +41,7 @@ int main()
 
     SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(virtualWidth, virtualHeight, "2D Dungeon Explorer");
+    InitAudioDevice();
     
     ToggleFullscreen();
     SetTargetFPS(60);
@@ -54,6 +61,19 @@ int main()
     Texture2D congrats = LoadTexture("assets/escapeText.png");
     Texture2D exitText = LoadTexture("assets/exitText.png");
     Texture2D deathText = LoadTexture("assets/deathText.png");
+
+    Sound buttonSound = LoadSound("assets/Music/Play_Button.wav");
+    Sound coinSound = LoadSound("assets/Music/Coin.wav");
+    Sound HealthSound = LoadSound("assets/Music/Health.wav");
+    Sound playerAttackSound = LoadSound("assets/Music/PlayerAttack.wav");
+    Sound gameOverSound = LoadSound("assets/Music/GameOver.wav");
+
+    
+    PlaySound(buttonSound); StopSound(buttonSound);
+    PlaySound(coinSound); StopSound(coinSound);
+    PlaySound(HealthSound); StopSound(HealthSound);
+
+
 
     Map Level1("assets/Map_Assets/Level1.txt",4,9,34,"assets/Map_Assets/Dungeon_Bricks_Shadow.png");
     Map Level2("assets/Map_Assets/Level2.txt",46,24,34,"assets/Map_Assets/Full.png");
@@ -109,6 +129,8 @@ int main()
             button.Draw();
            
             if(button.isClicked()){
+                PlaySound(buttonSound);
+                
                 gameStarted = true;
             }
 
@@ -144,6 +166,8 @@ int main()
 
             DrawTexturePro(deathbackground,{0,0,(float)(int)deathbackground.width,(float)(int)deathbackground.height},{0,0,(float)(int)GetScreenWidth(),(float)(int)GetScreenHeight()},{0.0f,0.0f},0.0f,WHITE);
             
+           
+           
             float scale = 0.8f;
             float scaledW = deathText.width * scale;
             float scaledH = deathText.height * scale;
@@ -152,10 +176,14 @@ int main()
             DrawTexturePro(deathText,{0, 0, (float)deathText.width, (float)deathText.height},{center.x, center.y, scaledW, scaledH}, {0.0f, 0.0f}, 0.0f, WHITE);
 
 
+            if (!gOplayed) {
+                PlaySound(gameOverSound);
+                gOplayed = true;
+            }
 
             if(IsKeyPressed(KEY_SPACE)){
 
-            
+            gOplayed = false;
 
             Levels[0].Reset("assets/Map_Assets/Level1.txt",4,9,34,"assets/Map_Assets/Dungeon_Bricks_Shadow.png");
             Levels[1].Reset("assets/Map_Assets/Level2.txt",46,24,34,"assets/Map_Assets/Full.png");
@@ -189,6 +217,15 @@ int main()
         PlayerTest.Update(dt);
         golem.Update(dt);
 
+        hSCooldown -= dt;
+        cSCooldown -=dt;
+        pACooldown -=dt;
+
+        if (pACooldown <= 0.0f && IsKeyPressed(KEY_SPACE)){
+                    PlayerTest.SetAnimation(PlayerTest.getAnim("attack"),8);
+                    PlaySound(playerAttackSound);
+                    pACooldown = 0.2f;
+        }
 
 /////////////////////////////////// GOLEM AND PLAYER INTERACTION /////////////////////////////////////////
 
@@ -200,6 +237,8 @@ int main()
             if (CheckCollisionRecs(playerHitbox, golemHitbox))
             {
                 golem.TakeDamage(1);
+
+
             }
 
         }
@@ -267,8 +306,19 @@ int main()
         if (Levels[currLevel].getMap()[(int)tilePos.y][(int)tilePos.x].collectable) ///// IS CURRENT TILE A COLLECTABLE?
         {
             Collectable* c = Levels[currLevel].getcollectables()[(int)tilePos.y][(int)tilePos.x]; 
-            if (!c->IsCollected())
-            {
+            if (!c->IsCollected()){
+
+                if (c->getType() == "Health" && hSCooldown <= 0.0f) {
+                    PlaySound(HealthSound);
+                    hSCooldown = 0.2f;
+                } else if (c->getType() == "Score" && cSCooldown <= 0.0f) {
+                    PlaySound(coinSound);
+                    cSCooldown = 0.2f;
+                }
+
+
+
+            
                 c->Collect(); 
 
                 /////////////////////////// HEALTH COLLECTABLE ////////////////////////////////
@@ -285,6 +335,7 @@ int main()
                 
                 else{
                     PlayerTest.setScore(c->getValue());
+                    
                     Text.Create("+10 Score",textPos,GREEN);   
 
                 }
@@ -315,6 +366,13 @@ int main()
     UnloadTexture(deathbackground);
     UnloadTexture(deathText);
 
+    UnloadSound(HealthSound);
+    UnloadSound(buttonSound);
+    UnloadSound(coinSound);
+    UnloadSound(gameOverSound);
+    UnloadSound(playerAttackSound);
+
+    CloseAudioDevice();
     CloseWindow();
     return 0;
 }
