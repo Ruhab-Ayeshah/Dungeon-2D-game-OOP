@@ -35,6 +35,16 @@ Map::Map(const string& filename,int w, int f, int e,char const* tileFile){
 Map::~Map(){
     UnloadTexture(tileset);
     UnloadTexture(exitTexture);
+
+    for (int y = 0; y < 20; y++) {
+        for (int x = 0; x < 30; x++) {
+            if (collectables[y][x]) {
+            delete collectables[y][x];
+            collectables[y][x] = nullptr;
+            }
+        }
+    }
+    
 }
 
 void Map::loadFile(const string& filename){
@@ -99,6 +109,14 @@ void Map::loadFile(const string& filename){
 
                 case '$':
                     CompleteMap[y][x] = {true,false,false,true,false,floorID};
+                    collectables[y][x] = new Collectable("Score",10);
+                    collectables[y][x]->SetMapPos({(float)x * 32, (float)y * 32});
+                break;
+
+                case 'H':
+                    CompleteMap[y][x] = {true,false,false,true,false,floorID};
+                    collectables[y][x] = new Collectable("Health",10);
+                    collectables[y][x]->SetMapPos({(float)x * 32, (float)y * 32});
                 break;
 
                 case 'X':
@@ -131,20 +149,29 @@ bool Map::isWalkable(int x, int y){
     }
 }
 
-void Map::Draw(){
+void Map::Draw()
+{
+    for (int y = 0; y < 20; y++) {
+        for (int x = 0; x < 30; x++) {
+            Vector2 pos = {(float)x * tileSize, (float)y * tileSize};
+            Rectangle src = getTileRec(CompleteMap[y][x].tileID);
 
-    for(int y=0;y<20;y++){
-        for(int x=0;x<30;x++){
-            Rectangle source = getTileRec(CompleteMap[y][x].tileID);
-            Vector2 newPos = {(float)x*32,(float)y*32};
-            if(CompleteMap[y][x].tileID==34){
-                DrawTextureRec(exitTexture, {0,0,(float)tileSize,(float)tileSize},newPos,WHITE);
-            }else{
-            DrawTextureRec(tileset,source,newPos,WHITE);
+            if (CompleteMap[y][x].tileID == exitID) {
+                DrawTextureRec(exitTexture, {0, 0, 32, 32}, pos, WHITE);
+            } else {
+                DrawTextureRec(tileset, src, pos, WHITE);
+            }
+
+            if(CompleteMap[y][x].collectable && collectables[y][x] != nullptr&&!collectables[y][x]->IsCollected()){
+                collectables[y][x]->Draw();
+                collectables[y][x]->Update();
             }
         }
     }
+
+    
 }
+
 
 
 
@@ -158,4 +185,12 @@ Vector2& Map::getExit(){
 
 Tile& Map::getTile(int x, int y) {
     return CompleteMap[y][x];
+}
+
+Collectable* (*Map::getcollectables())[30] {
+    return collectables;
+}
+
+Tile (&Map::getMap())[20][30] {
+    return CompleteMap;
 }

@@ -13,6 +13,7 @@ class Player
 
         int Health;
         int Power;
+        int Score;
 
         Animation Idle;
         Animation Attack;
@@ -37,7 +38,6 @@ public:
 
         Player(Vector2 &s);
         ~Player();
-        int health = 3;
 
         void TakeDamage(int amount);
         bool IsDead();
@@ -65,6 +65,14 @@ public:
         void ResetToSpawn(Vector2 spawn);
 
         Vector2& getGridPos();
+
+        void setHealth(int h);
+        void setScore(int s);
+        void setPower(int p);
+
+        int getHealth();
+        int getScore();
+        int getPower();
 };
 
 #endif
