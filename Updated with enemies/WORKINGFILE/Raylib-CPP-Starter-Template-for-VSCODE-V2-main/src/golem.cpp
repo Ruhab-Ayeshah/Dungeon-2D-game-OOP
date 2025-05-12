@@ -30,16 +30,9 @@ Golem::Golem(Vector2 position)
     PlayerPosition = nullptr;
     HitsTaken = 0;
 
-    patrolDirection = 1;  
-    hasPatrolRange = false;
-    patrolMinX = 0;
-    patrolMaxX = 0;
-    
     map = nullptr;
     attackDone = false;
     
-    patrolStartTileX = (int)(Position.x / 32) - 4;
-    patrolEndTileX = (int)(Position.x / 32) + 4;
 }
 
 Golem::~Golem()
@@ -63,12 +56,6 @@ void Golem::SetMap(Map *m)
 bool Golem::CanMoveTo(float nextX, float nextY)
 {
     if (!map) return false;
-    
-    // Get current position tiles
-    int currentLeftTile = (int)(Position.x / 32);
-    int currentRightTile = (int)((Position.x + 31) / 32); 
-    int currentTopTile = (int)(Position.y / 32);
-    int currentBottomTile = (int)((Position.y + 31) / 32);
     
     // Get destination position tiles
     int destLeftTile = (int)(nextX / 32);
@@ -135,7 +122,8 @@ void Golem::AI_Behavior(float dt)
     stateChangeCooldown -= dt;
     directionChangeCooldown -= dt;
     
-    const float chaseRange = 150.0f;  // Increased range for better detection
+    const float chaseRange = 350.0f;
+    const float fasterChase=150.0f;  // Increased range for better detection
     const float attackRange = 40.0f;  // Slightly increased attack range
     
     // Calculate center points for distance calculation
@@ -173,12 +161,15 @@ void Golem::AI_Behavior(float dt)
     
     // ====== CHASE BEHAVIOR ======
     if (distance <= chaseRange) {
-        moveSpeed = 40; // Speed up when chasing
+        moveSpeed = 30; // Speed up when chasing
         // Only change to chase state if we're not in a cooldown period
         if (State != "chase" && stateChangeCooldown <= 0.0f) {
             State = "chase";
             SetAnimation(Walk, 0);
             stateChangeCooldown = 0.5f;
+        }
+        if (distance <= fasterChase){
+            moveSpeed = 50; // Speed up when chasing
         }
         
         // Allow updating the direction even during chase, but with a cooldown
@@ -241,49 +232,6 @@ void Golem::AI_Behavior(float dt)
         return;
     }
     
-    // ====== PATROL BEHAVIOR ======
-    // Initialize patrol range if not set
-    if (!hasPatrolRange) {
-        // Set patrol range based on spawn position
-        int currentTileX = (int)(Position.x / 32);
-        patrolMinX = (currentTileX - 3) * 32;
-        patrolMaxX = (currentTileX + 3) * 32;
-        hasPatrolRange = true;
-    }
-    
-    // Only change to patrol state if we're not in an action or cooldown period
-    if (State != "patrol" && State != "idle" && !isActionPlaying && stateChangeCooldown <= 0.0f) {
-        State = "patrol";
-        SetAnimation(Walk, 0);
-        stateChangeCooldown = 0.5f;
-    }
-    
-    // Handle patrol movement
-    if (State == "patrol") {
-        // Calculate next position
-        float nextX = Position.x + patrolDirection * moveSpeed * dt;
-        
-        // Check if we hit patrol bounds or an obstacle
-        if (nextX < patrolMinX || nextX > patrolMaxX || !CanMoveTo(nextX, Position.y)) {
-            // Only reverse direction if not in cooldown
-            if (directionChangeCooldown <= 0.0f) {
-                // Reverse direction
-                patrolDirection *= -1;
-                isFlipped = patrolDirection < 0;
-                directionChangeCooldown = 0.5f; // Half second cooldown
-                
-                // Briefly go to idle
-                if (State != "idle") {
-                    State = "idle";
-                    SetAnimation(Idle, 0);
-                    stateChangeCooldown = 1.0f; // Longer cooldown for idle transitions
-                }
-            }
-        } else {
-            // Continue patrolling
-            Position.x = nextX;
-        }
-    }
 }
 
 
@@ -313,18 +261,7 @@ void Golem::Update(float dt)
     // Run AI behavior 
     AI_Behavior(dt);
     
-    // If we're in idle state longer than 1 second, try to go back to patrol
-    static float idleTimer = 0;
-    if (State == "idle") {
-        idleTimer += dt;
-        if (idleTimer > 1.0f) {
-            State = "patrol";
-            SetAnimation(Walk, 0);
-            idleTimer = 0;
-        }
-    } else {
-        idleTimer = 0;
-    }
+
 }
 
 void Golem::Draw()
