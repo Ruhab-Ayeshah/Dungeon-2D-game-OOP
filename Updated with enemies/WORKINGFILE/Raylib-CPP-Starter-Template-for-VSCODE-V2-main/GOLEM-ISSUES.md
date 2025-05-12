@@ -1,3 +1,7 @@
 # issues at the moment:
-->Movement of Golem is unpredictable and it tends to get stuck on the wall
-->Death Animation keeps looping
+->It's not patrolling <br/>
+-> It's not attacking consistently in attack range
+# Issues fixed:
+-> Chases properly now <br/>
+-> Doesnt walk onto walls <br/>
+-> Dimensions fixed
