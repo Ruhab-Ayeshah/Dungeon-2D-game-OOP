@@ -132,7 +132,7 @@ int main()
 /////////////////////////////////// GOLEM AND PLAYER INTERACTION /////////////////////////////////////////
 
         Rectangle playerHitbox = {PlayerTest.Position.x, PlayerTest.Position.y, 32, 32};
-        Rectangle golemHitbox = {golem.Position.x, golem.Position.y, 64, 64};
+        Rectangle golemHitbox = {golem.Position.x, golem.Position.y, 32, 32};
 
         if (IsKeyPressed(KEY_SPACE) && !golem.IsDead())
         {
@@ -158,6 +158,17 @@ int main()
         if (golem.IsDead())
         {
             DrawText("Golem Died!", 400, 340, 40, GREEN);
+        }
+/////////////////////////////////// GOLEM AND PLAYER INTERACTION /////////////////////////////////////////
+
+
+/////////////////////////////////// CHECK IF PLAYER AT EXIT /////////////////////////////////////////
+
+        if(currLevel<1 &&Vector2Equals(PlayerTest.getGridPos(), Levels[currLevel].getExit())){
+            currLevel++;
+            PlayerTest.ResetToSpawn(Levels[currLevel].getSpawn());
+            golem.SetTarget(&PlayerTest.Position);
+            golem.SetMap(&Levels[currLevel]);
         }
 /////////////////////////////////// GOLEM AND PLAYER INTERACTION /////////////////////////////////////////
 
