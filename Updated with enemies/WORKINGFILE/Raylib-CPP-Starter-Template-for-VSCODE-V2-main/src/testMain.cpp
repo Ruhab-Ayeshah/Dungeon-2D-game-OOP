@@ -53,7 +53,7 @@ int main()
     int currLevel = 0; 
 
     Player PlayerTest(Levels[currLevel].getSpawn());
-    Golem golem({200, 200});
+    Golem golem({250, 250});
     globalGolem = &golem;
 
     golem.SetTarget(&PlayerTest.Position);
