@@ -91,6 +91,7 @@ void Player::SetAnimation(Animation &anim, int r)
 
         currentAnim->CurrentFrame = anim.FirstFrame;
         currentAnim->DurationLeft = anim.Speed;
+        
     }
 }
 

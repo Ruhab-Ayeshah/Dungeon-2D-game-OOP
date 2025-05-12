@@ -218,16 +218,22 @@ int main()
             {
                 PlayerTest.TakeDamage(100);
                 golem.attackDone = false;
+
+                if(PlayerTest.IsDead()){
+                    PlayerTest.setActionStatus(true);
+                    PlayerTest.SetAnimation(PlayerTest.getAnim("death"), 7);
+                }
+
             }
 
-            if (PlayerTest.IsDead())
-            {
-                
-                pDeath = true;
-            }
 
         }
 
+        if (PlayerTest.IsDead()){
+                if (!PlayerTest.getActionStatus()) {
+                    pDeath = true;
+                }
+        }
         
         
 /////////////////////////////////// GOLEM AND PLAYER INTERACTION /////////////////////////////////////////
