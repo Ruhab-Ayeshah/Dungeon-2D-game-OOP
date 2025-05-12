@@ -25,6 +25,8 @@ class Map{
     int tilesPerRow;
     Vector2 Spawn;   
     Vector2 Exit;
+    Vector2 EnemySpawn[3]; //assuming 3 enemies for now
+    int currEnemyCount;    int maxEnemyCount;
 
     int wallID, floorID, exitID;
 
@@ -49,8 +51,7 @@ class Map{
 
         Vector2& getSpawn();
         Vector2& getExit();
-
-
+        Vector2& getEnemySpawn(int index);
         Tile& getTile(int x, int y);
 
         Collectable* (*getcollectables())[30];
