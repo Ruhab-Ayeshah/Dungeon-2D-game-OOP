@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include <string>
 #include "Map.h"
+
 class Golem : public Enemy
 {
     float moveSpeed;
@@ -11,10 +12,18 @@ class Golem : public Enemy
     Vector2 *PlayerPosition;
     float WanderTimer;
     int HitsTaken;
-    float patrolStartX;
 
-    float patrolEndX;
     int patrolDirection; // 1 for right, -1 for left
+    bool hasPatrolRange;
+    float patrolMinX;
+    float patrolMaxX;
+     float   stateChangeCooldown;
+   float  directionChangeCooldown;
+    // Separate sprite sheets for each animation
+    Texture2D IdleSheet;
+    Texture2D WalkSheet;
+    Texture2D AttackSheet;
+    Texture2D DieSheet;
 
 public:
     Golem(Vector2 position);
@@ -25,7 +34,6 @@ public:
     std::string State;
     int patrolStartTileX;
     int patrolEndTileX;
-    void InitializePatrol();
     bool CanMoveTo(float nextX, float nextY);
     void Update(float dt) override;
     void Draw() override;
@@ -39,3 +47,4 @@ private:
 };
 
 #endif
+
