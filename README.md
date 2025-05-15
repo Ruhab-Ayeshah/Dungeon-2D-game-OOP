@@ -19,7 +19,7 @@ A simple 2D tile-based dungeon exploration game built with **C++** and **raylib*
 
 ## 🎮 How to Play
 
-Download the **testMain.exe** file and launch it
+Download the repository and launch the testMain.exe file
 
 - **W / A / S / D** - Move the player
 - **SPACE** - Attack and restart the game if the player dies
